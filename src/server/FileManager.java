@@ -10,6 +10,9 @@ public class FileManager {
 
     protected static boolean saveFile(String name, byte[] fileContent) {
         File file = new File(DATA_DIR, name);
+        if (file.exists()) {
+            return false;
+        }
         try {
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(fileContent);
@@ -22,12 +25,15 @@ public class FileManager {
         }
         return false;
     }
-    protected static byte[] loadFile(String name) throws IOException {
-        if (idRegister.containsValue(name)) {
-            File file = new File(DATA_DIR + name);
-        } else if (idRegister.containsKey(Integer.parseInt(name))){
-            name = idRegister.get(name);
-        }  else if (!idRegister.containsValue(name) && !idRegister.containsKey(name)) {
+    protected static byte[] loadFile(String msg) throws IOException {
+        String name = "";
+        try {
+            if (idRegister.containsValue(msg.substring(5))) {
+                name = msg.substring(5);
+            } else if (idRegister.containsKey(Integer.parseInt(msg.substring(3)))) {
+                name = getNamebyId(Integer.parseInt(msg.substring(3)));
+            }
+        } catch (StringIndexOutOfBoundsException | NumberFormatException e) {
             return null;
         }
         FileInputStream fis = new FileInputStream(DATA_DIR + name);
@@ -36,10 +42,15 @@ public class FileManager {
         return content;
     }
 
-    protected static boolean deleteFile(String name) {
-        if (idRegister.containsKey(Integer.parseInt(name))){
-            name = getNamebyId(Integer.parseInt(name));
-        }  else if (!idRegister.containsValue(name) && !idRegister.containsKey(name)) {
+    protected static boolean deleteFile(String msg) {
+        String name = "";
+        try {
+            if (idRegister.containsValue(msg.substring(5))) {
+                name = msg.substring(5);
+            } else if (idRegister.containsKey(Integer.parseInt(msg.substring(3)))) {
+                name = getNamebyId(Integer.parseInt(msg.substring(3)));
+            }
+        } catch (StringIndexOutOfBoundsException | NumberFormatException e) {
             return false;
         }
         File file = new File(DATA_DIR + name);

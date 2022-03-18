@@ -25,7 +25,8 @@ public class Server {
 
     }
     private void handleRequest(DataInputStream inputStream, DataOutputStream outputStream, ServerSocket socket) throws IOException {
-        switch (inputStream.readUTF()) {
+        String command = inputStream.readUTF();
+        switch (command) {
             case "PUT":
                 put(inputStream, outputStream);
                 break;
@@ -65,8 +66,7 @@ public class Server {
 
     private void get(DataInputStream input, DataOutputStream output) {
         try {
-            String data = input.readUTF();
-            String name = getName(data);
+            String name = input.readUTF();
             byte[] content = FileManager.loadFile(name);
             if (content != null) {
                 output.writeUTF(String.valueOf(Status.SUCCESFUL.code));
@@ -82,23 +82,15 @@ public class Server {
 
     private void delete(DataInputStream input, DataOutputStream output) {
         try {
-            String data = input.readUTF();
-            String name = getName(data);
+            String name = input.readUTF();
             if (FileManager.deleteFile(name)) {
                 output.writeUTF(String.valueOf(Status.SUCCESFUL.code));
             } else {
                 output.writeUTF(String.valueOf(Status.NOT_FOUND.code));
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private String getName(String data) {
-        if (data.startsWith("ID_")) {
-            return FileManager.getNamebyId(Integer.parseInt(data.substring(3)));
-        }
-        return data.substring(5);
     }
 
 }
